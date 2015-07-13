@@ -1,0 +1,243 @@
+<html>
+<head>
+	<link href="ExternalCSS.css" type="text/css" rel="stylesheet" />
+	<script src="jquery-2.1.1.min.js"> </script>
+	<script src="jcanvas.min.js"> </script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+	<div id="wrapper">
+		<div id="insertFunctions"> <!-- This div only applies to the Desktop interface !-->
+			<h2> Canvas Sandbox </h2>
+			By 1205595
+			<h3> Insert Shapes </h3>
+				<button id="3" name="noOfSides">Triangle</button>
+				<button id="4" name="noOfSides">Square</button>			
+				<button id="5" name="noOfSides">Pentagon</button> <br>
+				<button id="6" name="noOfSides">Hexagon</button>
+				<button id="7" name="noOfSides">Heptagon</button>
+				<button id="8" name="noOfSides">Octagon</button>
+			<h3> Insert Text </h3>
+			<input type="text" id="wordInsert" placeholder="Insert word here..." />
+			<br>
+			<br>
+			<input type="button" onclick="drawText()" id="letterSubmit" value="Submit" />
+			<br>
+			<h3> Insert Image </h3>
+				<button id="frankTheDogDesktop"> Frank </button>
+				<button id="garfield"> Garfield </button>
+				<button id="bugsBunny"> Bugs Bunny </button>
+			<h3> Insert Mask </h3>
+				<button id="maskInsert"> Try Me! </button>
+				<br>
+				<br>
+				<button id="clearScreenDesktop" name="clear"> Clear Canvas </button>
+		</div>
+	<div id="deviceButtons"> <!-- this div is only present when the application is viewed from a small screen or browser window. It will replace the insertFunctions div. !-->
+			<button id="printWord" class="phoneButtons" name="hello">"Hello World!" </button> <!-- The class phoneButtons allows these buttons to be styled separately from !-->
+			<button id="randomShape" class="phoneButtons" name="randomShape">Shape</button> <!-- The other buttons in this document. !-->
+			<button id="frankTheDog" class="phoneButtons" name="frank"> Frank the Dog </button>
+			<button id="mask" class="phoneButtons"> Mask </button> 
+			<button id="clearScreen" class="phoneButtons" name="clear"> Clear </button>
+			
+		</div>
+		<div id="canvasDiv">
+			<canvas id="canvas"> Your browser does not support HTML5 Canvas. Please download a browser from this century.</canvas>
+		</div>
+	</div>
+	<script>
+		var canvas = document.getElementById("canvas"); // Canvas needs to be declared as the one we plan on using on the webpage.
+		var ctx = canvas.getContext("2d"); // The canvas being 2 Dimensional must be defined before we can draw on it.
+		var randomX = Math.random()*canvas.innerWidth;  // I felt that randomly drawing the object prevented mass overlapping of layers that
+		var randomY = Math.random()*canvas.innerHeight; // The user's mouse or touch would not be able to reach.
+		var canvasContainer = document.getElementById("canvasDiv"); 
+		canvas.width = canvasContainer.offsetWidth; 
+		canvas.height = canvasContainer.offsetHeight;
+			
+		document.getElementById("printWord").addEventListener("click", function() {drawText("1");});
+		document.getElementById("frankTheDog").addEventListener("click", function() {drawImage("1");});
+		document.getElementById("garfield").addEventListener("click", function() {drawImage("2");});
+		document.getElementById("bugsBunny").addEventListener("click", function() {drawImage("3");});
+		document.getElementById("mask").addEventListener("click", function() {drawMask();});
+		document.getElementById("maskInsert").addEventListener("click", function() {drawMask();});
+		document.getElementById("clearScreen").addEventListener("click", function() {clearCanvas();});
+		document.getElementById("clearScreenDesktop").addEventListener("click", function() {clearCanvas();});
+		
+		document.getElementById("3").addEventListener("click", function() { polygonDraw("3");}); // When the triangle button is clicked, pass the number 3 into the polygonDraw function.
+		document.getElementById("4").addEventListener("click", function() { polygonDraw("4");}); // The same rules apply, but the number passed changes.
+		document.getElementById("5").addEventListener("click", function() { polygonDraw("5");});
+		document.getElementById("6").addEventListener("click", function() { polygonDraw("6");});
+		document.getElementById("7").addEventListener("click", function() { polygonDraw("7");});
+		document.getElementById("8").addEventListener("click", function() { polygonDraw("8");});
+		document.getElementById("randomShape").addEventListener("click", function() {polygonDraw();}); // This will pass no value, causing polygonDraw's if statement to reach the else clause.
+		
+		function polygonDraw(a) {
+			var radius = "40";  // these pre-defined variables are subject to change depending on the user's interface.
+			var sides = "0"; 
+			if (a == "3"){  // If 3 was passed into this function, then the number of sides in drawPolygon will be 3. 
+			 sides = "3"}
+			else if (a == "4"){
+			 sides = "4"}
+			else if (a == "5"){
+			 sides = "5"}
+			else if (a == "6"){
+			 sides = "6"}
+			 else if (a == "7"){
+			 sides = "7"}
+			 else if (a == "8"){
+			 sides = "8"}
+			else {
+			 sides = (Math.floor((Math.random() * 10) + 1)) // Sides is set to a random number between 1 and 10 for the device interface which
+			// cannot select the preferred shape due to screen size restrictions.
+			 radius = "25"}; // Shapes produced on the phone interface are half the size to account for lack of canvas space.
+			 
+			randomX = Math.random()*canvas.width; 
+			randomY = Math.random()*canvas.height; 
+			$('canvas').drawPolygon({  // The Jcanvas syntax.
+			strokeStyle: 'black',
+			strokeWidth: 4,
+			layer: true,  // Each produced drawing must be on it's own layer, so it can be dragged and interacted with.
+			draggable: true, // Allows the user to click and move the object equal to the coordinates of the cursor.
+			bringToFront: true, // The most recently produced object will be at the front, to ensure accessibility for the user.
+			x: (randomX), y: (randomY), 
+			radius: (radius),
+			sides: (sides),
+			mouseover: function(layer) {     
+				$(this).animateLayer(layer, {
+				scale: 1.5  
+				}, 100);
+			},
+				mouseout: function(layer) {
+				$(this).animateLayer(layer, {
+				scale: 1
+				}, 100);
+			},
+		});
+		}
+			
+		function drawText(a) { 
+			 var content = document.getElementById("wordInsert").value;
+			 var fontSize = "48";
+			 if (a == "1") {  // If the user arrived at this function through the phone interface:
+				content = "Hello World!" // the content becomes pre-defined and disregards the textbox.
+				fontSize = "24"}; // Also, make the text half the size as the canvas is much smaller.
+			 randomX = Math.random()*canvas.width; // Calculates random coordinates within the height and width
+			randomY = Math.random()*canvas.height; // of the canvas.
+			$('canvas').drawText({
+				fillStyle: '#39b',
+				layer: true, // In Jcanvas, each instance of formContent must be on it's own layer so it can individually manipulated with events.
+				  draggable: true, // Enables text to be selected by touch or mouse click, and moved around the canvas.
+				  bringToFront: true, // Allows a draggable text layer to be drawn in front of existing layers.
+				  x: (randomX), y: (randomY), // Where the formContent instance appears on Canvas, is randomised.
+				  fontSize: (fontSize),
+				  shadowColor: '#000',
+			shadowBlur: 5,
+			shadowX: -7, shadowY: 7,
+			  fontFamily: 'Verdana, sans-serif',
+			  text: (content), // The text printed on canvas will be defined by the wordInsert Textbox.
+			  cursors: { 
+					// Show pointer on hover
+					mouseover: 'pointer',
+					// Show 'move' cursor on mousedown
+					mousedown: 'move',
+					// Revert cursor on mouseup
+					mouseup: 'pointer'
+					},
+			  mouseover: function(layer) {  // different animations for different actions that occur by the user.
+				$(this).animateLayer(layer, {
+				scale: 1.5  // "Increase the size of the text by 50% when hovering over it with the cursor"
+				}, 100);
+			},
+				mouseout: function(layer) {
+				$(this).animateLayer(layer, {
+				scale: 1
+				}, 100);
+			},
+				mousedown:
+				function(layer) {
+				$(this).animateLayer(layer, {
+				strokeStyle: '#000',
+				strokeWidth: 2,
+				}, 1);
+			},
+				mouseup: function(layer) {
+				$(this).animateLayer(layer, {
+				strokeStyle: 'transparent',
+				}, 1);
+			},
+			  dragcancel: function(layer) {  //Spins the text when it touches the canvas width/height.
+				$(this).animateLayer(layer, {
+			  rotate: '+=360'
+				});
+			  }
+			});
+		}
+		
+		function drawImage(a) { // Function works, but can fail due to an unavoidable Cross-Origin Resource Policy Error.
+		var image = "frank.png";
+			if
+				(a == "2") {
+				image = "garfield.png"
+				}
+			else if
+				(a == "3") {
+				image = "bugsbunny.png" };
+				randomX = Math.random()*canvas.width;
+				randomY = Math.random()*canvas.height;
+				$('canvas').drawImage({
+					source: (image),
+					name: 'drawAnImage',
+					index: -1,
+					x: (randomX), y: (randomY)
+				});		
+		}
+		
+		function drawMask() {
+				randomX = Math.random()*canvas.width;
+				randomY = Math.random()*canvas.height;
+				// This shape is a mask
+				$('canvas').drawArc({
+						layer: true,
+						draggable: true,
+					  fillStyle: '#36b',
+					  x: (randomX), y: (randomY),
+					  radius: 55,
+					  mask: true
+				})
+				// This shape is being masked
+				.drawRect({
+						layer: true,
+						draggable: true,
+					  fillStyle: '#6c1',
+					  shadowColor: '#000',
+						shadowBlur: 5,
+						shadowX: -7, shadowY: 7,
+					  x: (randomX), y: (randomY),
+					  width: 40, height: 40
+					  
+				})
+				.drawArc({
+						layer: true,
+						draggable: true,
+					  fillStyle: 'crimson',
+					  shadowColor: '#000',
+						shadowBlur: 5,
+						shadowX: -7, shadowY: 7,
+					  x: (randomX), y: (randomY),
+					  radius: 25
+				})
+					// Restore mask
+					.restoreCanvas({
+						layer: true
+				});
+		}
+		function clearCanvas() { 
+			$('canvas').clearCanvas();  // Clears the entire canvas for new entries.
+			$('canvas').removeLayers(); // Removes all existing layers created by Jcanvas.
+			canvas.width = canvasContainer.offsetWidth;  // Also refreshes the width and height and canvas, in case the browser window has been resized.
+			canvas.height = canvasContainer.offsetHeight;
+		}
+	</script>
+</body>
+
+</html>
